@@ -5,34 +5,34 @@ workflows:
         instance_type: mac_mini_m1
 scripts:
     - name: Install npm dependencies and update Cordova version
-    script: | 
+script: | 
       npm install
       npm ci # equivalent of npm install for CI systems.
               # Requires package-lock.json or npm-shrinkwrap.json to be present
       cvm install 9.0.0
       cvm use 9.0.0
-  -  name: Setup Cordova iOS platform
+      -  name: Setup Cordova iOS platform
       script: | 
         ionic cordova platform remove ios --nosave
         ionic cordova platform add ios \
           --confirm \
           --no-interactive \
           --noresources
-  - name: Cocoapods installation
+      - name: Cocoapods installation
       script: | 
         cd platforms/ios && pod install
-  - name: Update dependencies and copy web assets to native project
-    script: | 
+      - name: Update dependencies and copy web assets to native project
+      script: | 
       # if you don't need to update native dependencies, use this:
       # npx cap copy
       #
       # to update native dependencies, use this command:
       npx cap sync
-  - name: Set up code signing settings on Xcode project
-    script: | 
+      - name: Set up code signing settings on Xcode project
+      script: | 
       xcode-project use-profiles
-  - name: Build ipa for distribution
-    script: | 
+      - name: Build ipa for distribution
+      script: | 
       package_type=$(defaults read ~/export_options.plist method)
       identity=$(defaults read ~/export_options.plist signingCertificate)
       team=$(defaults read ~/export_options.plist teamID)
@@ -51,8 +51,8 @@ scripts:
           }
         }EOF
       cordova build ios --release --device --buildConfig='build.json'
-  artifacts:
-    - build/ios/ipa/*.ipa
-    - /tmp/xcodebuild_logs/*.log
-    - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-    - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+      artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
